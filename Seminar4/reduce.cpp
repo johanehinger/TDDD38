@@ -4,9 +4,6 @@
 
 using namespace std;
 
-/*
-    This is a comment.
-*/
 template <typename T>
 T add(T const &val1, T const &val2)
 {
