@@ -17,7 +17,7 @@ T reduce(T const ( &array)[N], T initial = {}, T (*func)(T const &, T const &) =
     result += func(array[0], initial);
     for (unsigned i{1}; i < N; i++)
     {
-        result += func(result, array[i]);
+        result = func(result, array[i]);
     }
     return result;
 }
