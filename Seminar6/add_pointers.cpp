@@ -5,7 +5,7 @@ namespace details
     // implement add_pointers function template here
     //+ U is not a pointer
     template< typename T, typename U, typename = std::enable_if_t< !std::is_pointer_v< U > > >
-    T add_pointers_helper( ) 
+    T add_pointers_helper( )
     {
       return T{};
     }
