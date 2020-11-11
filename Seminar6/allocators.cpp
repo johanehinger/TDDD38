@@ -1,5 +1,40 @@
 #include <cassert>
+#include <string>
+#include <iostream>
 
+template<typename T>
+struct New_allocator
+{
+  template<typename... Args>
+  static T* create(Args&&... args)
+  {
+    return new T(std::forward<Args>(args)...);
+  }
+
+  static void destroy(T* object)
+  {
+    delete object;
+  }
+};
+
+template<typename T>
+struct Tracker_allocator
+{
+  template<typename... Args>
+  static T* create(Args&&... args)
+  {
+    std::cout << "create" << std::endl;
+    return new T(std::forward<Args>(args)...);
+  }
+
+  static void destroy(T* object)
+  {
+    std::cout << "delete" << std::endl;
+    delete object;
+  }
+};
+
+template<typename T, template <typename> typename allocator = New_allocator>
 class Stack
 {
 
@@ -24,26 +59,27 @@ public:
     }
   }
 
-  void push(int const& value)
+  void push(T const& value)
   {
-    head = new Node{value, head};
+    head = allocator<Node>::create(value, head);
   }
 
-  int pop()
+  T pop()
   {
-    int result{top()};
+    T result{top()};
     Node* old {head};
     head = head->next;
-    delete old;
+    //delete old;
+    allocator<Node>::destroy(old);
     return result;
   }
 
-  int& top()
+  T& top()
   {
     return head->value;
   }
 
-  int const& top() const
+  T const& top() const
   {
     return head->value;
   }
@@ -57,8 +93,11 @@ private:
 
   struct Node
   {
-    int value;
+    T value;
     Node* next;
+
+    template<typename U>
+    Node(U&& value, Node* next) : value{std::forward<U>(value)}, next{next} {}
   };
 
   Node* head;
@@ -67,26 +106,52 @@ private:
 
 int main()
 {
-  Stack st {};
-  assert(st.empty());
+  {
+    Stack<std::string> st {};
+    assert(st.empty());
 
-  st.push(1);
-  assert(!st.empty());
-  assert(st.top() == 1);
+    st.push("1");
+    assert(!st.empty());
+    assert(st.top() == "1");
 
-  st.push(2);
-  assert(st.top() == 2);
-  assert(st.pop() == 2);
+    st.push("2");
+    assert(st.top() == "2");
+    assert(st.pop() == "2");
 
-  assert(st.pop() == 1);
+    assert(st.pop() == "1");
 
-  assert(st.empty());
+    assert(st.empty());
 
-  st.push(3);
-  assert(st.pop() == 3);
+    st.push("3");
+    assert(st.pop() == "3");
 
-  st.push(4);
+    st.push("4");
 
-  st.push(5);
-  assert(st.pop() == 5);
+    st.push("5");
+    assert(st.pop() == "5");
+  }
+  {
+    Stack<std::string, Tracker_allocator> st {};
+    assert(st.empty());
+
+    st.push("1");
+    assert(!st.empty());
+    assert(st.top() == "1");
+
+    st.push("2");
+    assert(st.top() == "2");
+    assert(st.pop() == "2");
+
+    assert(st.pop() == "1");
+
+    assert(st.empty());
+
+    st.push("3");
+    assert(st.pop() == "3");
+
+    st.push("4");
+
+    st.push("5");
+    assert(st.pop() == "5");
+  }
 }
