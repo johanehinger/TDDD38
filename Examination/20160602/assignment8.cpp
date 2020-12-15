@@ -1,39 +1,65 @@
 #include <iostream>
+#include <vector>
+#include <list>
 using namespace std;
 
-template<typenmame T>
-class sort
+struct Ascending
 {
-    sort(T*) {}
-    // for ( ; begin +1 != end; ++begin)
-    // {
-    //     int* min = begin;
-    //     for (int* pos = begin + 1; pos != end; ++pos)
-    //         if (*pos < *min)
-    //             min = pos;
-    //     std::iter_swap(begin, min);
-    // }
-}
+    template <typename T>
+    static void sort(T begin, T end)
+    {
+        for (; next(begin) != end; ++begin)
+        {
+            auto min = begin;
+            for (auto pos = next(begin); pos != end; ++pos)
+                if (*pos < *min)
+                    min = pos;
+            std::iter_swap(begin, min);
+        }
+    }
+};
+
+struct Descending
+{
+    template <typename T>
+    static void sort(T begin, T end)
+    {
+        for (; next(begin) != end; ++begin)
+        {
+            auto min = begin;
+            for (auto pos = next(begin); pos != end; ++pos)
+                if (*pos > *min)
+                    min = pos;
+            std::iter_swap(begin, min);
+        }
+    }
+};
+template <typename T, class Policy=Descending>
+class Sort
+{
+public:
+    template <typename Iter>
+    static void sort(Iter begin, Iter end)
+    {
+        Policy::sort(begin, end);
+    }
+};
 
 int main()
 {
-    // int arr[] = {2,3,5,1,6,8};
-    // ::sort(begin(arr), end(arr));
-    // bool first {true};
-    // for ( auto i : arr )
-    // {
-    //     if ( !first )
-    //         cout << ", ";
-    //     first = false;
-    //     cout << i;
-    // }
-    // cout << endl;
-
-    /*
-    vector<int> values {2,3,6,8,3};
+    vector<int> values{2, 3, 6, 8, 3};
     Sort<int, Ascending>::sort(begin(values), end(values));
-
+    for (auto a : values)
+    {
+        cout << a << endl;
+    }
+    
     list<string> words {"hi", "hello", "all", "students"};
-    Sort<string, Descending>::sort(begin(words), end(words));
-    */
+    Sort<string, Ascending>::sort(begin(words), end(words));
+
+     for (auto a : words)
+    {
+        cout << a << endl;
+    }
+    
 }
