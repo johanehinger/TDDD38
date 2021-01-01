@@ -115,7 +115,7 @@ int main()
   for_each(begin(factors), end(factors), 
   [&](auto factor){
     result *= factor;
-  });
+  }); 
 
   // print the result
   cout << result << endl;
